@@ -2,20 +2,19 @@ package dk.si.countryData.countryData;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.json.JSONObject;
-import org.json.XML;
+import dk.si.countryData.classes.CountryData;
+import get.dk.si.route.MetaData;
+import get.dk.si.route.Root;
+import get.dk.si.route.Route;
+import get.dk.si.route.Util;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.*;
 
 
 public class CountryDataClient {
 
+    private final Gson gson = new Gson();
     private final GetCountryByCity getCountryByCity = new GetCountryByCity();
 
 
@@ -25,14 +24,44 @@ public class CountryDataClient {
 
     }
 
+    public void countryDataHandler(String message) {
 
-    public void getCountryDataConcurrent(String message) throws IOException {
+        JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
+        System.out.println(jsonMessage);
 
-        // Mangler håndtering af message til at finde travelTo string i metadata.
+        String city = jsonMessage.get("metaData").getAsJsonObject().get("travelRequest").getAsJsonObject().get("cityTo").getAsString();
+        System.out.println(city);
+
+        try {
+
+            CountryData countryData = getCountryDataConcurrent(city);
 
 
-        JsonObject city = getCountryByCity.getCountryByCity(message);
+
+            Util util = new Util();
+            Root root = util.rootFromJson(message);
+            MetaData metaData = root.getMetaData();
+            metaData.put("countryData", countryData);
+
+            root.setMetaData(metaData);
+
+            Route route = root.nextRoute();
+            String json = util.rootToJson(root);
+            util.sendToRoute(route, json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    private CountryData getCountryDataConcurrent(String cityInput) throws IOException {
+
+        JsonObject city = getCountryByCity.getCountryByCity(cityInput);
         String countryCode = city.get("countryCode").getAsString();
+        String countryName = city.get("country").getAsString();
         System.out.println(countryCode);
 
 
@@ -49,6 +78,10 @@ public class CountryDataClient {
             String currency = futureCurrency.get(3, TimeUnit.SECONDS);
             System.out.println(currency);
 
+            service.shutdown();
+            CountryData countryData = new CountryData(countryCode, countryName, flag, currency);
+            return  countryData;
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -58,9 +91,8 @@ public class CountryDataClient {
         }
 
         service.shutdown();
+        return null;
     }
-
-
 
 }
 

@@ -18,7 +18,24 @@
         <java.version>1.8</java.version>
     </properties>
 
+
+    <repositories>
+        <repository>
+            <id>Lynges-repo</id>
+            <name>Internet mirror for rasmuslynge.com</name>
+            <url>http://rasmuslynge.com:8081/repository/internal/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+
+        <dependency>
+            <groupId>get.dk.si</groupId>
+            <artifactId>routingslip</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
@@ -58,6 +75,28 @@
             <artifactId>json</artifactId>
             <version>20180813</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.12.0</version>
+        </dependency>
+
+
 
     </dependencies>
 

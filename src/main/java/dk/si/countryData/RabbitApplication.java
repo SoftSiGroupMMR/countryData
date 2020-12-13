@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class RabbitApplication
 {
-    private final static String QUEUE_NAME = "email";
+    private final static String QUEUE_NAME = "countryData";
 
     public static void main(String[] args) throws Exception
     {
@@ -22,6 +22,7 @@ public class RabbitApplication
         connectQueue();
     }
 
+    
     public static void connectQueue() throws Exception {
         CountryDataClient countryDataClient = new CountryDataClient();
         // Same as the producer: tries to create a queue, if it wasn't already created
@@ -41,7 +42,7 @@ public class RabbitApplication
         {
             String message = new String(delivery.getBody(), "UTF-8");
             System.out.println(" [x] Received '" + message + "'");
-            countryDataClient.getCountryDataConcurrent(message);
+            countryDataClient.countryDataHandler(message);
         };
         channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
     }
