@@ -41,7 +41,7 @@ public class RabbitApplication
         {
             String message = new String(delivery.getBody(), "UTF-8");
             System.out.println(" [x] Received '" + message + "'");
-            countryDataClient.getCountryData(message);
+            countryDataClient.getCountryDataConcurrent(message);
         };
         channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
     }
