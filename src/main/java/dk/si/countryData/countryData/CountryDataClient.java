@@ -17,12 +17,13 @@ public class CountryDataClient {
     private final Gson gson = new Gson();
     private final GetCountryByCity getCountryByCity = new GetCountryByCity();
 
-
+/*
     public static void main(String[] args) throws IOException {
         CountryDataClient countryDataClient = new CountryDataClient();
         countryDataClient.getCountryDataConcurrent("lyngby");
 
     }
+ */
 
     public void countryDataHandler(String message) {
 

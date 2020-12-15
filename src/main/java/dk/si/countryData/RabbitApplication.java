@@ -22,7 +22,7 @@ public class RabbitApplication
         connectQueue();
     }
 
-    
+
     public static void connectQueue() throws Exception {
         CountryDataClient countryDataClient = new CountryDataClient();
         // Same as the producer: tries to create a queue, if it wasn't already created
