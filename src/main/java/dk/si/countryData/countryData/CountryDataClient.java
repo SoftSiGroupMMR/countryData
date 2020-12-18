@@ -7,12 +7,20 @@ import get.dk.si.route.MetaData;
 import get.dk.si.route.Root;
 import get.dk.si.route.Route;
 import get.dk.si.route.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.concurrent.*;
 
 
+
+
 public class CountryDataClient {
+
+
+
+    protected Logger logger = LoggerFactory.getLogger(CountryDataClient.class.getName());
 
     private final Gson gson = new Gson();
     private final GetCountryByCity getCountryByCity = new GetCountryByCity();
@@ -26,14 +34,14 @@ public class CountryDataClient {
  */
 
     public void countryDataHandler(String message) {
-
+        try {
+            logger.info("recieved message");
         JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
         System.out.println(jsonMessage);
 
         String city = jsonMessage.get("metaData").getAsJsonObject().get("travelRequest").getAsJsonObject().get("cityTo").getAsString();
         System.out.println(city);
 
-        try {
 
             CountryData countryData = getCountryDataConcurrent(city);
 
@@ -51,7 +59,9 @@ public class CountryDataClient {
             util.sendToRoute(route, json);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //LOGGER
+            logger.error(e.getMessage());
+
         }
     }
 
