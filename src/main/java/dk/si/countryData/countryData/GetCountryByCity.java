@@ -2,6 +2,8 @@ package dk.si.countryData.countryData;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,13 +28,11 @@ public class GetCountryByCity {
 
 
         // Set the appropriate HTTP parameters.
-
         httpConn.setRequestMethod("GET");
         httpConn.setDoOutput(false);
         httpConn.setDoInput(true);
 
         // Read the response and write it to standard out.
-
         InputStreamReader isr =
                 new InputStreamReader(httpConn.getInputStream());
         BufferedReader in = new BufferedReader(isr);

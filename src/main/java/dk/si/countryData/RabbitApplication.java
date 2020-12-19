@@ -35,13 +35,11 @@ public class RabbitApplication
 
         // Register for a queue
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
         // Get notified, if a message for this receiver arrives
         DeliverCallback deliverCallback = (consumerTag, delivery) ->
         {
             String message = new String(delivery.getBody(), "UTF-8");
-            System.out.println(" [x] Received '" + message + "'");
             countryDataClient.countryDataHandler(message);
         };
         channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});

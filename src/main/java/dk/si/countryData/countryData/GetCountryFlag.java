@@ -2,6 +2,8 @@ package dk.si.countryData.countryData;
 
 import org.json.JSONObject;
 import org.json.XML;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +16,8 @@ import java.util.concurrent.Callable;
 
 public class GetCountryFlag implements Callable<String> {
 
-    String countryCode;
+    private String countryCode;
+    private final String SOAP_URL = "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso";
 
     public GetCountryFlag(String countryCode) {
         this.countryCode = countryCode;
@@ -33,7 +36,7 @@ public class GetCountryFlag implements Callable<String> {
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "  <soap:Body>\n" +
                 "    <CountryFlag xmlns=\"http://www.oorsprong.org/websamples.countryinfo\">\n" +
-                "      <sCountryISOCode>"+ countryCode +"</sCountryISOCode>\n" +
+                "      <sCountryISOCode>" + countryCode + "</sCountryISOCode>\n" +
                 "    </CountryFlag>\n" +
                 "  </soap:Body>\n" +
                 "</soap:Envelope>";
@@ -41,11 +44,8 @@ public class GetCountryFlag implements Callable<String> {
         b = body.getBytes();
 
 
-
-        String SOAPUrl = "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso";
-
         // Create the connection where we're going to send the file.
-        URL url = new URL(SOAPUrl);
+        URL url = new URL(SOAP_URL);
         URLConnection connection = url.openConnection();
         HttpURLConnection httpConn = (HttpURLConnection) connection;
 
@@ -63,7 +63,6 @@ public class GetCountryFlag implements Callable<String> {
         out.close();
 
         // Read the response and write it to standard out.
-
         InputStreamReader isr =
                 new InputStreamReader(httpConn.getInputStream());
         BufferedReader in = new BufferedReader(isr);

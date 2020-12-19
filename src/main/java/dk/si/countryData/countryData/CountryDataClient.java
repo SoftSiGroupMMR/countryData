@@ -14,38 +14,23 @@ import java.io.*;
 import java.util.concurrent.*;
 
 
-
-
 public class CountryDataClient {
 
 
-
-    protected Logger logger = LoggerFactory.getLogger(CountryDataClient.class.getName());
+    private Logger logger = LoggerFactory.getLogger(CountryDataClient.class.getName());
 
     private final Gson gson = new Gson();
     private final GetCountryByCity getCountryByCity = new GetCountryByCity();
 
-/*
-    public static void main(String[] args) throws IOException {
-        CountryDataClient countryDataClient = new CountryDataClient();
-        countryDataClient.getCountryDataConcurrent("lyngby");
-
-    }
- */
-
     public void countryDataHandler(String message) {
         try {
             logger.info("recieved message");
-        JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
-        System.out.println(jsonMessage);
+            JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
 
-        String city = jsonMessage.get("metaData").getAsJsonObject().get("travelRequest").getAsJsonObject().get("cityTo").getAsString();
-        System.out.println(city);
+            String city = jsonMessage.get("metaData").getAsJsonObject().get("travelRequest").getAsJsonObject().get("cityTo").getAsString();
 
 
             CountryData countryData = getCountryDataConcurrent(city);
-
-
 
             Util util = new Util();
             Root root = util.rootFromJson(message);
@@ -59,50 +44,31 @@ public class CountryDataClient {
             util.sendToRoute(route, json);
 
         } catch (Exception e) {
-            //LOGGER
-            logger.error(e.getMessage());
-
+            logger.error(e.getLocalizedMessage());
         }
     }
 
 
-
-
-    private CountryData getCountryDataConcurrent(String cityInput) throws IOException {
-
+    private CountryData getCountryDataConcurrent(String cityInput) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        logger.info("getCountryDataConcurrent, collection data from SOAP endpoints");
         JsonObject city = getCountryByCity.getCountryByCity(cityInput);
         String countryCode = city.get("countryCode").getAsString();
         String countryName = city.get("country").getAsString();
-        System.out.println(countryCode);
-
 
         ExecutorService service = Executors.newFixedThreadPool(3);
         Future<String> futureFlag = service.submit(new GetCountryFlag(countryCode));
         Future<String> futureCurrency = service.submit(new GetCountryCurrency(countryCode));
 
 
-        try {
+        String flag = futureFlag.get(3, TimeUnit.SECONDS);
 
-            String flag = futureFlag.get(3, TimeUnit.SECONDS);
-            System.out.println(flag);
-
-            String currency = futureCurrency.get(3, TimeUnit.SECONDS);
-            System.out.println(currency);
-
-            service.shutdown();
-            CountryData countryData = new CountryData(countryCode, countryName, flag, currency);
-            return  countryData;
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
+        String currency = futureCurrency.get(3, TimeUnit.SECONDS);
 
         service.shutdown();
-        return null;
+        CountryData countryData = new CountryData(countryCode, countryName, flag, currency);
+
+        service.shutdown();
+        return countryData;
     }
 
 }
